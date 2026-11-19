@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DST10 LED Review</title>
+<meta name="theme-color" content="#0d0f14">
+<style>
+:root{--bg:#0d0f14;--card:#171a22;--line:#262b36;--tx:#eef1f6;--mu:#8b93a5;--ok:#2fbf71;--warn:#f0a330;--acc:#6aa8ff}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:rgba(13,15,20,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px 10px}
+h1{font-size:18px;margin:0 0 8px}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#06101f;font-weight:600}
+main{max-width:900px;margin:0 auto;padding:8px 16px 40px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin:20px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.item{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;color:inherit;text-decoration:none}
+.item img{width:112px;height:63px;object-fit:cover;border-radius:6px;background:#000;flex:none}
+.item b{display:block;font-size:14px;font-weight:600;line-height:1.25}
+.meta{font-size:12px;color:var(--mu)}
+.st{display:inline-block;font-size:11px;font-weight:600;border-radius:4px;padding:1px 6px;margin-top:4px}
+.st.ok{background:rgba(47,191,113,.15);color:var(--ok)}
+.st.fix{background:rgba(240,163,48,.15);color:var(--warn)}
+.st.none{background:#222733;color:var(--mu)}
+/* player view */
+#view{position:fixed;inset:0;z-index:10;background:var(--bg);overflow-y:auto;display:none}
+#view.open{display:block}
+.vbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.vbar button{background:none;border:0;color:var(--tx);font-size:15px;padding:6px 8px;cursor:pointer}
+.vbar .t{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vwrap{max-width:900px;margin:0 auto}
+video{width:100%;aspect-ratio:16/9;background:#000;display:block}
+.pad{padding:12px 16px 40px}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-bottom:14px}
+.nav a{color:var(--acc);text-decoration:none;font-size:14px}
+form{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+label{display:block;font-size:13px;color:var(--mu);margin:0 0 4px}
+input,textarea{width:100%;background:#0f1218;border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:10px;font:inherit;font-size:16px}
+textarea{min-height:90px;resize:vertical}
+.row{margin-bottom:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{padding:12px;border-radius:8px;border:1px solid var(--line);background:#0f1218;color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.seg button.ok.on{background:var(--ok);border-color:var(--ok);color:#04150b}
+.seg button.fix.on{background:var(--warn);border-color:var(--warn);color:#1d1200}
+.small{background:none;border:1px solid var(--line);color:var(--acc);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;margin-top:6px}
+.submit{width:100%;padding:13px;border:0;border-radius:8px;background:var(--acc);color:#06101f;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.submit:disabled{opacity:.5}
+.msg{font-size:13px;margin-top:8px;min-height:1em}
+.fb{list-style:none;padding:0;margin:16px 0 0}
+.fb li{border-top:1px solid var(--line);padding:10px 0}
+.fb .who{font-weight:600}
+.fb .n{white-space:pre-wrap;margin-top:3px}
+.banner{background:rgba(240,163,48,.12);border:1px solid rgba(240,163,48,.4);color:var(--warn);padding:10px 12px;border-radius:8px;font-size:13px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>DST10 LED Review</h1>
+  <div class="chips" id="filters">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="none">Not reviewed</button>
+    <button class="chip" data-f="fix">Needs correction</button>
+    <button class="chip" data-f="ok">Approved</button>
+  </div>
+</header>
+<main id="list"></main>
+
+<section id="view" aria-modal="true">
+  <div class="vbar"><button id="back">&larr; Back</button><div class="t" id="vt"></div></div>
+  <div class="vwrap">
+    <video id="vid" controls playsinline preload="metadata"></video>
+    <div class="pad">
+      <div class="nav"><a href="#" id="prev"></a><a href="#" id="next"></a></div>
+      <form id="form">
+        <div class="row"><label for="nm">Your name</label><input id="nm" autocomplete="name" maxlength="60" required></div>
+        <div class="row"><label>Status</label>
+          <div class="seg"><button type="button" class="ok" data-s="Approved">✓ Approve</button><button type="button" class="fix" data-s="Needs correction">✎ Needs correction</button></div>
+        </div>
+        <div class="row"><label for="nt">Notes / corrections</label><textarea id="nt" maxlength="2000" placeholder="e.g. 1:23 wrong logo, spelling of name..."></textarea>
+          <button type="button" class="small" id="ts">+ Add current time</button></div>
+        <button class="submit" id="sub">Submit</button>
+        <div class="msg" id="msg"></div>
+      </form>
+      <ul class="fb" id="fb"></ul>
+    </div>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script src="videos.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const GROUPS={perf:'Performances',avp:'AVPs',asset:'Assets'};
+let FB=[], filter='all', cur=null, status='';
+const fmt=s=>{s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fbFor(id){return FB.filter(f=>f.id===id)}
+function stateOf(id){
+  // latest entry per person decides; any outstanding correction => fix
+  const by={};fbFor(id).forEach(f=>by[f.name.trim().toLowerCase()]=f);
+  const v=Object.values(by);if(!v.length)return{k:'none',t:'Not reviewed'};
+  const fix=v.filter(f=>f.status!=='Approved');
+  if(fix.length)return{k:'fix',t:'Needs correction ('+fix.map(f=>f.name).join(', ')+')'};
+  return{k:'ok',t:'Approved by '+v.map(f=>f.name).join(', ')};
+}
+function renderList(){
+  let h='';
+  for(const g in GROUPS){
+    const vs=VIDEOS.filter(v=>v.group===g&&(filter==='all'||stateOf(v.id).k===filter));
+    if(!vs.length)continue;
+    h+=`<h2>${GROUPS[g]} (${vs.length})</h2><div class="grid">`;
+    for(const v of vs){const s=stateOf(v.id);
+      h+=`<a class="item" href="#${v.id}"><img loading="lazy" src="t/${v.id}.jpg" alt=""><div><b>${esc(v.title)}</b><span class="meta">${fmt(v.dur)} · ${v.mb} MB</span><br><span class="st ${s.k}">${esc(s.t)}</span></div></a>`;}
+    h+='</div>';
+  }
+  if(!window.FEEDBACK_URL)h='<div class="banner">Feedback storage not connected yet (FEEDBACK_URL in config.js is empty). Videos still play.</div>'+h;
+  $('#list').innerHTML=h||'<p class="meta">Nothing here.</p>';
+}
+function renderFb(){
+  const l=fbFor(cur.id).slice().reverse();
+  $('#fb').innerHTML=l.length?l.map(f=>`<li><span class="who">${esc(f.name)}</span> <span class="st ${f.status==='Approved'?'ok':'fix'}">${esc(f.status)}</span> <span class="meta">${esc(new Date(f.ts).toLocaleString())}</span>${f.notes?`<div class="n">${esc(f.notes)}</div>`:''}</li>`).join(''):'<li class="meta">No feedback yet.</li>';
+}
+function setStatus(s){status=s;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.s===s))}
+function open(id){
+  const i=VIDEOS.findIndex(v=>v.id===id);if(i<0)return close();
+  cur=VIDEOS[i];
+  $('#vt').textContent=cur.title;
+  const vid=$('#vid');vid.poster='t/'+cur.id+'.jpg';vid.src='v/'+cur.id+'.mp4';
+  const p=VIDEOS[i-1],n=VIDEOS[i+1];
+  $('#prev').textContent=p?'← '+p.title:'';$('#prev').href=p?'#'+p.id:'#';
+  $('#next').textContent=n?n.title+' →':'';$('#next').href=n?'#'+n.id:'#';
+  setStatus('');$('#nt').value='';$('#msg').textContent='';
+  renderFb();
+  $('#view').classList.add('open');$('#view').scrollTop=0;document.body.style.overflow='hidden';
+}
+function close(){const vid=$('#vid');vid.pause();vid.removeAttribute('src');vid.load();cur=null;$('#view').classList.remove('open');document.body.style.overflow='';renderList()}
+function route(){const id=location.hash.slice(1);id?open(id):close()}
+async function load(){
+  if(!window.FEEDBACK_URL)return;
+  try{const r=await fetch(FEEDBACK_URL+'?t='+Date.now());FB=await r.json();}catch(e){console.warn(e)}
+  cur?renderFb():renderList();
+}
+$('#back').onclick=()=>{location.hash=''};
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>setStatus(b.dataset.s));
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{filter=c.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));renderList()});
+$('#ts').onclick=()=>{const t=$('#nt');t.value+=(t.value&&!t.value.endsWith('\n')?'\n':'')+'['+fmt($('#vid').currentTime)+'] ';t.focus()};
+try{$('#nm').value=localStorage.getItem('dst-name')||''}catch(e){}
+$('#form').onsubmit=async e=>{
+  e.preventDefault();const msg=$('#msg');
+  const name=$('#nm').value.trim(),notes=$('#nt').value.trim();
+  if(!name)return msg.textContent='Please enter your name.';
+  if(!status)return msg.textContent='Choose Approve or Needs correction.';
+  if(status!=='Approved'&&!notes)return msg.textContent='Please describe the correction.';
+  if(!window.FEEDBACK_URL)return msg.textContent='Feedback storage not connected yet.';
+  try{localStorage.setItem('dst-name',name)}catch(e){}
+  const entry={id:cur.id,video:cur.title,name,status,notes};
+  $('#sub').disabled=true;msg.textContent='Sending…';
+  try{
+    const r=await fetch(FEEDBACK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(entry)});
+    const j=await r.json();if(!j.ok)throw new Error(j.error||'failed');
+    FB.push({...entry,ts:new Date().toISOString()});
+    msg.textContent='✓ Saved. Thank you!';$('#nt').value='';setStatus('');renderFb();
+  }catch(err){msg.textContent='Could not send. Check your connection and try again.'}
+  $('#sub').disabled=false;
+};
+window.addEventListener('hashchange',route);
+renderList();route();load();
+</script>
+</body>
+</html>
