@@ -1,4 +1,4 @@
-// Google Apps Script backend for the DST10 LED Review page.
+// Google Apps Script backend for the DST10 Performances review page.
 // Paste into a Google Sheet: Extensions > Apps Script. See SETUP.md.
 const SHEET = 'Feedback';
 

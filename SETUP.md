@@ -1,12 +1,12 @@
-# DST10 LED Review
+# DST10 Performances review page
 
-A mobile-friendly page for reviewing the LED videos. Reviewers watch a video, choose **Approve** or **Needs correction**, add notes (with an optional timestamp button), and sign with their name.
+A mobile-friendly page for reviewing the DST10 performance videos. Reviewers watch a video, choose **Approve** or **Needs correction**, add notes (with an optional timestamp button), and sign with their name.
 
 The videos here are small 480p copies so they load fast on phones. They are for review only; the full-quality files stay offline.
 
 ## Connect the feedback sheet (one time, about 5 minutes)
 
-1. Create a new Google Sheet, for example "DST10 LED Feedback".
+1. Create a new Google Sheet, for example "DST10 Performances Feedback".
 2. Go to **Extensions → Apps Script**, delete the sample code, paste in `feedback-apps-script.gs`, and save.
 3. Click **Deploy → New deployment**, choose the type **Web app**, and set:
    - Execute as: **Me**
