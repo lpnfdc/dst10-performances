@@ -113,7 +113,7 @@ function renderList(){
     if(!vs.length)continue;
     h+=`<h2>${GROUPS[g]} (${vs.length})</h2><div class="grid">`;
     for(const v of vs){const s=stateOf(v.id);
-      h+=`<a class="item" href="#${v.id}"><img loading="lazy" src="t/${v.id}.jpg" alt=""><div><b>${esc(v.title)}</b><span class="meta">${fmt(v.dur)} · ${v.mb} MB</span><br><span class="st ${s.k}">${esc(s.t)}</span></div></a>`;}
+      h+=`<a class="item" href="#${v.id}"><img loading="lazy" src="t/${v.id}.jpg" alt=""><div><b>${VIDEOS.indexOf(v)+1}. ${esc(v.title)}</b><span class="meta">${fmt(v.dur)} · ${v.mb} MB</span><br><span class="st ${s.k}">${esc(s.t)}</span></div></a>`;}
     h+='</div>';
   }
   if(!window.FEEDBACK_URL)h='<div class="banner">Feedback storage not connected yet (FEEDBACK_URL in config.js is empty). Videos still play.</div>'+h;
